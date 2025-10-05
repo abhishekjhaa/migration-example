@@ -52,7 +52,7 @@ services:
       PORT: 3002
       NODE_ENV: test
     ports:
-      - "3002:3002"
+      - "3005:3002"
     depends_on:
       postgres-integration:
         condition: service_healthy

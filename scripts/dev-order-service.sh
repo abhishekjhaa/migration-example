@@ -49,18 +49,18 @@ cd ..
 
 echo -e "${BLUE}🔧 Setting up database schema...${NC}"
 cd lib
-export DATABASE_URL="postgresql://postgres:postgres@localhost:5434/order_management_integration"
+export DATABASE_URL="postgresql://postgres:postgres@localhost:5433/order_management"
 npx prisma migrate deploy
 cd ..
 
 echo -e "${BLUE}🚀 Starting Order Service locally...${NC}"
 cd services/order-service
-export DATABASE_URL="postgresql://postgres:postgres@localhost:5434/order_management_integration"
+export DATABASE_URL="postgresql://postgres:postgres@localhost:5433/order_management"
 export PORT=3001
 export NODE_ENV=development
 
 echo -e "${GREEN}✅ Environment variables set:${NC}"
-echo -e "  ${GREEN}DATABASE_URL:${NC} postgresql://postgres:postgres@localhost:5434/order_management_integration"
+echo -e "  ${GREEN}DATABASE_URL:${NC} postgresql://postgres:postgres@localhost:5433/order_management"
 echo -e "  ${GREEN}PORT:${NC} 3001"
 echo -e "  ${GREEN}NODE_ENV:${NC} development"
 

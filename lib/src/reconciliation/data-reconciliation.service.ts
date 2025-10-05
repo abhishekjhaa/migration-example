@@ -9,8 +9,8 @@ interface ReconciliationResult {
   discrepancies: Array<{
     id: string;
     field: string;
-    legacyValue: any;
-    modernValue: any;
+    legacyValue: unknown;
+    modernValue: unknown;
     difference: number;
   }>;
 }
@@ -18,6 +18,11 @@ interface ReconciliationResult {
 @Injectable()
 export class DataReconciliationService {
   private readonly logger = new Logger(DataReconciliationService.name);
+
+  // Constants for reconciliation thresholds
+  private static readonly TOLERANCE = 0.01;
+  private static readonly HEALTHY_THRESHOLD = 0.999;
+  private static readonly WARNING_THRESHOLD = 0.99;
 
   constructor(private readonly prisma: PrismaService) {}
 
@@ -30,20 +35,20 @@ export class DataReconciliationService {
         id: 'legacy-invoice-1',
         customerId: 'legacy-cust-1',
         orderId: 'legacy-order-1',
-        total: 110.00,
-        subtotal: 100.00,
-        tax: 10.00,
-        discount: 0.00,
+        total: 110.0,
+        subtotal: 100.0,
+        tax: 10.0,
+        discount: 0.0,
         status: 'draft',
       },
       {
         id: 'legacy-invoice-2',
         customerId: 'legacy-cust-2',
         orderId: 'legacy-order-2',
-        total: 198.00,
-        subtotal: 200.00,
-        tax: 18.00,
-        discount: 20.00,
+        total: 198.0,
+        subtotal: 200.0,
+        tax: 18.0,
+        discount: 20.0,
         status: 'draft',
       },
     ];
@@ -56,7 +61,7 @@ export class DataReconciliationService {
 
     // Create lookup maps
     const legacyMap = new Map(legacyInvoices.map((inv: any) => [inv.id, inv]));
-    const modernMap = new Map(modernInvoices.map(inv => [inv.id, inv]));
+    const modernMap = new Map(modernInvoices.map((inv) => [inv.id, inv]));
 
     // Compare each invoice
     for (const [id, legacyInvoice] of legacyMap) {
@@ -83,7 +88,7 @@ export class DataReconciliationService {
 
         if (typeof legacyVal === 'number' && typeof modernVal === 'number') {
           const difference = Math.abs(legacyVal - modernVal);
-          if (difference > 0.01) {
+          if (difference > DataReconciliationService.TOLERANCE) {
             discrepancies.push({
               id,
               field,
@@ -96,11 +101,11 @@ export class DataReconciliationService {
         } else if (field === 'status') {
           // Map legacy status to modern status
           const statusMap: Record<string, string> = {
-            'draft': 'DRAFT',
-            'sent': 'SENT',
-            'paid': 'PAID',
-            'overdue': 'OVERDUE',
-            'cancelled': 'CANCELLED',
+            draft: 'DRAFT',
+            sent: 'SENT',
+            paid: 'PAID',
+            overdue: 'OVERDUE',
+            cancelled: 'CANCELLED',
           };
 
           const mappedLegacyStatus = statusMap[legacyVal?.toLowerCase()] || legacyVal;
@@ -157,19 +162,19 @@ export class DataReconciliationService {
         id: 'legacy-order-1',
         customerId: 'legacy-cust-1',
         status: 'pending',
-        total: 100.00,
-        subtotal: 90.00,
-        tax: 10.00,
-        discount: 0.00,
+        total: 100.0,
+        subtotal: 90.0,
+        tax: 10.0,
+        discount: 0.0,
       },
       {
         id: 'legacy-order-2',
         customerId: 'legacy-cust-2',
         status: 'confirmed',
-        total: 200.00,
-        subtotal: 180.00,
-        tax: 20.00,
-        discount: 0.00,
+        total: 200.0,
+        subtotal: 180.0,
+        tax: 20.0,
+        discount: 0.0,
       },
     ];
 
@@ -180,7 +185,7 @@ export class DataReconciliationService {
     let matchingRecords = 0;
 
     const legacyMap = new Map(legacyOrders.map((ord: any) => [ord.id, ord]));
-    const modernMap = new Map(modernOrders.map(ord => [ord.id, ord]));
+    const modernMap = new Map(modernOrders.map((ord) => [ord.id, ord]));
 
     for (const [id, legacyOrder] of legacyMap) {
       const modernOrder = modernMap.get(id);
@@ -207,13 +212,13 @@ export class DataReconciliationService {
         if (field === 'status') {
           // Map legacy status to modern status
           const statusMap: Record<string, string> = {
-            'pending': 'PENDING',
-            'confirmed': 'CONFIRMED',
-            'processing': 'PROCESSING',
-            'shipped': 'SHIPPED',
-            'delivered': 'DELIVERED',
-            'cancelled': 'CANCELLED',
-            'returned': 'RETURNED',
+            pending: 'PENDING',
+            confirmed: 'CONFIRMED',
+            processing: 'PROCESSING',
+            shipped: 'SHIPPED',
+            delivered: 'DELIVERED',
+            cancelled: 'CANCELLED',
+            returned: 'RETURNED',
           };
 
           const mappedLegacyStatus = statusMap[legacyVal?.toLowerCase()] || legacyVal;
@@ -229,7 +234,7 @@ export class DataReconciliationService {
           }
         } else if (typeof legacyVal === 'number' && typeof modernVal === 'number') {
           const difference = Math.abs(legacyVal - modernVal);
-          if (difference > 0.01) {
+          if (difference > DataReconciliationService.TOLERANCE) {
             discrepancies.push({
               id,
               field,
@@ -274,9 +279,9 @@ export class DataReconciliationService {
     const matchRate = totalRecords > 0 ? totalMatching / totalRecords : 1;
 
     let overallHealth: 'HEALTHY' | 'WARNING' | 'CRITICAL';
-    if (matchRate >= 0.999) {
+    if (matchRate >= DataReconciliationService.HEALTHY_THRESHOLD) {
       overallHealth = 'HEALTHY';
-    } else if (matchRate >= 0.99) {
+    } else if (matchRate >= DataReconciliationService.WARNING_THRESHOLD) {
       overallHealth = 'WARNING';
     } else {
       overallHealth = 'CRITICAL';
@@ -291,7 +296,7 @@ export class DataReconciliationService {
     this.logger.log('Full reconciliation completed:', {
       totalRecords,
       totalMatching,
-      matchRate: `${(matchRate * 100).toFixed(2) }%`,
+      matchRate: `${(matchRate * 100).toFixed(2)}%`,
       overallHealth,
     });
 

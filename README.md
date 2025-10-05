@@ -1,6 +1,6 @@
 # Order Management System - Microservices Architecture
 
-A modernized Order Management System built with NestJS microservices, featuring PostgreSQL, repository pattern, comprehensive API documentation, and world-class test coverage.
+A modernized Order Management System built with NestJS microservices, featuring PostgreSQL, repository pattern, comprehensive API documentation, world-class test coverage, and production-ready AWS ECS deployment.
 
 ## 🏗️ Architecture Overview
 
@@ -9,8 +9,20 @@ This project demonstrates the migration from a legacy monolithic Order Managemen
 ### Services
 
 - **Order Service** (Port 3001): Handles order management and customer operations
-- **Invoice Service** (Port 3002): Manages invoice creation and calculations
+- **Invoice Service** (Port 3004): Manages invoice creation and calculations
 - **Shared Database**: PostgreSQL with Prisma ORM
+
+### Port Allocation
+
+**Local Deployment:**
+- PostgreSQL: `localhost:5433`
+- Order Service: `localhost:3001`
+- Invoice Service: `localhost:3004`
+
+**Integration Tests:**
+- PostgreSQL: `localhost:5434`
+- Order Service: `localhost:3003`
+- Invoice Service: `localhost:3005`
 
 ### Key Features
 
@@ -21,12 +33,15 @@ This project demonstrates the migration from a legacy monolithic Order Managemen
 - ✅ **Swagger Documentation**: Comprehensive API documentation
 - ✅ **Enhanced Error Handling**: User-friendly error responses with proper HTTP status codes
 - ✅ **Docker Support**: Containerized services for development and testing
-- ✅ **Comprehensive Integration Tests**: 53+ Jest-based e2e tests
+- ✅ **Comprehensive Integration Tests**: 53+ Jest-based e2e tests with separate port allocation
 - ✅ **Environment Configuration**: No hardcoded values, all configurable
 - ✅ **Query Parameters**: RESTful API design with flexible filtering
 - ✅ **Service Communication**: HTTP-based inter-service communication
 - ✅ **Production Ready**: Optimized Docker builds with caching and security
 - ✅ **Code Quality**: ESLint, Prettier, and comprehensive linting rules
+- ✅ **AWS ECS Deployment**: Production-ready CloudFormation infrastructure
+- ✅ **Port Separation**: Isolated ports for local deployment and integration tests
+- ✅ **Infrastructure as Code**: Complete AWS infrastructure defined in CloudFormation
 
 ## 🚀 Quick Start
 
@@ -238,7 +253,8 @@ migration-example/
 │   ├── run-invoice-service-integration-jest.sh
 │   └── run-full-integration-jest.sh
 ├── docker-compose.integration.yml  # Integration testing environment
-├── docker-compose.prod.yml   # Production environment
+├── docker-compose.yml        # Local development environment
+├── env.example              # Environment configuration template
 ├── .dockerignore            # Docker build exclusions
 ├── .gitignore              # Git exclusions (includes dist/ files)
 ├── .eslintrc.js            # ESLint configuration
@@ -271,14 +287,49 @@ migration-example/
 
 ## 🚀 Deployment
 
+### Local Deployment
+
+Deploy the complete system locally with Docker Compose:
+
+```bash
+# Deploy all services locally
+./scripts/deploy-local.sh
+```
+
+This will start:
+- PostgreSQL on `localhost:5433`
+- Order Service on `localhost:3001`
+- Invoice Service on `localhost:3004`
+
+### AWS ECS Deployment
+
+Deploy to AWS ECS using CloudFormation:
+
+```bash
+# Build and push Docker images to ECR
+./scripts/build-and-push-images.sh
+
+# Deploy complete infrastructure and services
+./scripts/deploy-ecs-complete.sh
+```
+
+The ECS deployment includes:
+- **ECS Fargate Cluster** with auto-scaling
+- **Application Load Balancer** with health checks
+- **RDS PostgreSQL** database
+- **CloudWatch** logging and monitoring
+- **IAM roles** and security groups
+- **Parameter Store** for configuration
+- **Secrets Manager** for database credentials
+
 ### Production Considerations
 
-1. **Environment Variables**: Update all environment variables for production
-2. **Database**: Use managed PostgreSQL service (AWS RDS, etc.)
-3. **Security**: Use strong secrets and proper network isolation
-4. **Monitoring**: Add logging and monitoring services
-5. **Scaling**: Use container orchestration (Kubernetes, ECS)
-6. **Load Balancing**: Add API gateway and load balancer
+1. **Environment Variables**: All configurable via Parameter Store and Secrets Manager
+2. **Database**: Managed PostgreSQL via AWS RDS
+3. **Security**: KMS encryption, IAM roles, VPC isolation
+4. **Monitoring**: CloudWatch logs, metrics, and container insights
+5. **Scaling**: ECS auto-scaling based on CPU utilization
+6. **Load Balancing**: Application Load Balancer with health checks
 
 ### Environment Variables
 

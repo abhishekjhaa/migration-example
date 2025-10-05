@@ -27,16 +27,19 @@ export class MigrationService {
 
       return {
         success: totalRecords > 0,
-        message: totalRecords > 0
-          ? `Migration successful: ${totalRecords} records migrated`
-          : 'No records found - migration may have failed',
+        message:
+          totalRecords > 0
+            ? `Migration successful: ${totalRecords} records migrated`
+            : 'No records found - migration may have failed',
         recordCounts: { customers, orders, invoices },
       };
     } catch (error) {
       this.logger.error('Migration validation failed:', error);
       return {
         success: false,
-        message: `Migration validation failed: ${error instanceof Error ? error.message : String(error)}`,
+        message: `Migration validation failed: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
         recordCounts: { customers: 0, orders: 0, invoices: 0 },
       };
     }

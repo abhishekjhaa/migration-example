@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 
-interface ReconciliationResult {
+export interface ReconciliationResult {
   entity: string;
   totalRecords: number;
   matchingRecords: number;
@@ -9,8 +9,8 @@ interface ReconciliationResult {
   discrepancies: Array<{
     id: string;
     field: string;
-    legacyValue: any;
-    modernValue: any;
+    legacyValue: unknown;
+    modernValue: unknown;
     difference: number;
   }>;
 }
@@ -18,6 +18,11 @@ interface ReconciliationResult {
 @Injectable()
 export class ReconciliationService {
   private readonly logger = new Logger(ReconciliationService.name);
+
+  // Constants for reconciliation thresholds
+  private static readonly HEALTHY_THRESHOLD = 0.999;
+  private static readonly WARNING_THRESHOLD = 0.99;
+  private static readonly TOLERANCE = 0.01;
 
   constructor(private readonly prisma: PrismaService) {}
 
@@ -38,9 +43,9 @@ export class ReconciliationService {
     const matchRate = totalRecords > 0 ? totalMatching / totalRecords : 1;
 
     let overallHealth: 'HEALTHY' | 'WARNING' | 'CRITICAL';
-    if (matchRate >= 0.999) {
+    if (matchRate >= ReconciliationService.HEALTHY_THRESHOLD) {
       overallHealth = 'HEALTHY';
-    } else if (matchRate >= 0.99) {
+    } else if (matchRate >= ReconciliationService.WARNING_THRESHOLD) {
       overallHealth = 'WARNING';
     } else {
       overallHealth = 'CRITICAL';
@@ -52,8 +57,8 @@ export class ReconciliationService {
   private async reconcileInvoices(): Promise<ReconciliationResult> {
     // Simulate legacy data comparison
     const legacyInvoices = [
-      { id: 'inv-1', total: 110.00, status: 'draft' },
-      { id: 'inv-2', total: 198.00, status: 'draft' },
+      { id: 'inv-1', total: 110.0, status: 'draft' },
+      { id: 'inv-2', total: 198.0, status: 'draft' },
     ];
 
     const modernInvoices = await this.prisma.invoice.findMany();
@@ -61,7 +66,7 @@ export class ReconciliationService {
     let matchingRecords = 0;
 
     for (const legacy of legacyInvoices) {
-      const modern = modernInvoices.find(m => m.id === legacy.id);
+      const modern = modernInvoices.find((m) => m.id === legacy.id);
       if (!modern) {
         discrepancies.push({
           id: legacy.id,
@@ -74,7 +79,7 @@ export class ReconciliationService {
       }
 
       let recordMatches = true;
-      if (Math.abs(legacy.total - Number(modern.total)) > 0.01) {
+      if (Math.abs(legacy.total - Number(modern.total)) > ReconciliationService.TOLERANCE) {
         discrepancies.push({
           id: legacy.id,
           field: 'total',
@@ -85,7 +90,9 @@ export class ReconciliationService {
         recordMatches = false;
       }
 
-      if (recordMatches) {matchingRecords++;}
+      if (recordMatches) {
+        matchingRecords++;
+      }
     }
 
     return {
@@ -100,8 +107,8 @@ export class ReconciliationService {
   private async reconcileOrders(): Promise<ReconciliationResult> {
     // Simulate legacy data comparison
     const legacyOrders = [
-      { id: 'ord-1', status: 'pending', total: 100.00 },
-      { id: 'ord-2', status: 'confirmed', total: 200.00 },
+      { id: 'ord-1', status: 'pending', total: 100.0 },
+      { id: 'ord-2', status: 'confirmed', total: 200.0 },
     ];
 
     const modernOrders = await this.prisma.order.findMany();
@@ -109,7 +116,7 @@ export class ReconciliationService {
     let matchingRecords = 0;
 
     for (const legacy of legacyOrders) {
-      const modern = modernOrders.find(m => m.id === legacy.id);
+      const modern = modernOrders.find((m) => m.id === legacy.id);
       if (!modern) {
         discrepancies.push({
           id: legacy.id,
@@ -123,8 +130,8 @@ export class ReconciliationService {
 
       let recordMatches = true;
       const statusMap: Record<string, string> = {
-        'pending': 'PENDING',
-        'confirmed': 'CONFIRMED',
+        pending: 'PENDING',
+        confirmed: 'CONFIRMED',
       };
 
       if (statusMap[legacy.status] !== modern.status) {
@@ -138,7 +145,9 @@ export class ReconciliationService {
         recordMatches = false;
       }
 
-      if (recordMatches) {matchingRecords++;}
+      if (recordMatches) {
+        matchingRecords++;
+      }
     }
 
     return {

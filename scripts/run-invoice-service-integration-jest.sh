@@ -72,7 +72,7 @@ cd ..
 echo -e "${BLUE}🚀 Starting Invoice Service locally...${NC}"
 export DATABASE_URL="postgresql://postgres:postgres@localhost:5434/order_management_integration"
 export ORDER_SERVICE_URL="http://localhost:3003" # Order Service running in Docker on port 3003
-export PORT=3002
+export PORT=3005
 export NODE_ENV=test
 
 # Start the service in background from the invoice service directory
@@ -82,7 +82,7 @@ INVOICE_SERVICE_PID=$!
 echo -e "${YELLOW}⏳ Waiting for Invoice Service to be ready...${NC}"
 timeout=60
 counter=0
-while ! curl -f http://localhost:3002/health > /dev/null 2>&1 && [ $counter -lt $timeout ]; do
+while ! curl -f http://localhost:3005/health > /dev/null 2>&1 && [ $counter -lt $timeout ]; do
     sleep 3
     counter=$((counter+3))
 done

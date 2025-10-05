@@ -21,9 +21,9 @@
     "migrate:legacy-data": "ts-node scripts/migrate-legacy-data.ts",
     "migrate:validate": "ts-node -e \"(async () => { const { MigrationService } = await import('./lib/src/migration/migration.service'); const { PrismaService } = await import('./lib/src/database/prisma.service'); const service = new MigrationService(new PrismaService()); const result = await service.validateMigration(); console.log(JSON.stringify(result, null, 2)); })()\"",
     "reconciliation:run": "ts-node -e \"(async () => { const { ReconciliationService } = await import('./lib/src/reconciliation/reconciliation.service'); const { PrismaService } = await import('./lib/src/database/prisma.service'); const service = new ReconciliationService(new PrismaService()); const result = await service.runFullReconciliation(); console.log(JSON.stringify(result, null, 2)); })()\"",
-    "docker:prod:up": "docker-compose -f docker-compose.prod.yml up -d",
-    "docker:prod:down": "docker-compose -f docker-compose.prod.yml down",
-    "docker:prod:logs": "docker-compose -f docker-compose.prod.yml logs -f",
+    "docker:prod:up": "docker-compose up -d",
+    "docker:prod:down": "docker-compose down",
+    "docker:prod:logs": "docker-compose logs -f",
     "db:migrate": "cd lib && npx prisma migrate dev",
     "db:migrate:prod": "cd lib && npx prisma migrate deploy",
     "db:generate": "cd lib && npx prisma generate"

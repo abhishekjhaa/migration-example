@@ -76,19 +76,19 @@ echo -e "${BLUE}🚀 Starting Invoice Service locally...${NC}"
 cd services/invoice-service
 export DATABASE_URL="postgresql://postgres:postgres@localhost:5434/order_management_integration"
 export ORDER_SERVICE_URL="http://localhost:3003"
-export PORT=3002
+export PORT=3004
 export NODE_ENV=development
 
 echo -e "${GREEN}✅ Environment variables set:${NC}"
 echo -e "  ${GREEN}DATABASE_URL:${NC} postgresql://postgres:postgres@localhost:5434/order_management_integration"
 echo -e "  ${GREEN}ORDER_SERVICE_URL:${NC} http://localhost:3003"
-echo -e "  ${GREEN}PORT:${NC} 3002"
+echo -e "  ${GREEN}PORT:${NC} 3004"
 echo -e "  ${GREEN}NODE_ENV:${NC} development"
 
 echo -e "${BLUE}🌐 Invoice Service will be available at:${NC}"
-echo -e "  ${GREEN}API:${NC} http://localhost:3002"
-echo -e "  ${GREEN}Swagger:${NC} http://localhost:3002/api/docs"
-echo -e "  ${GREEN}Health:${NC} http://localhost:3002/health"
+echo -e "  ${GREEN}API:${NC} http://localhost:3004"
+echo -e "  ${GREEN}Swagger:${NC} http://localhost:3004/api/docs"
+echo -e "  ${GREEN}Health:${NC} http://localhost:3004/health"
 
 echo -e "${YELLOW}⏳ Starting Invoice Service...${NC}"
 npm run start:dev

@@ -28,17 +28,19 @@ RUN --mount=type=cache,target=/root/.npm \
 # Build stage
 FROM base AS builder
 
-# Copy source code
+# Copy source code and configuration files
+COPY .eslintrc.js ./
+COPY .prettierrc ./
 COPY lib ./lib
 COPY services/invoice-service ./services/invoice-service
+
+# Generate Prisma client first (needed for TypeScript compilation)
+RUN cd lib && npx prisma generate
 
 # Build without cache mount to ensure proper file generation
 RUN cd lib && npm run build
 
 RUN cd services/invoice-service && npm run build
-
-# Generate Prisma client
-RUN cd lib && npx prisma generate
 
 # Production stage
 FROM node:18-slim AS production
@@ -91,4 +93,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3002/health || exit 1
 
 # Start the application
-CMD ["node", "dist/src/main.js"]
+CMD ["node", "dist/main.js"]

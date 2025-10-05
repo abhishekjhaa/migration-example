@@ -28,17 +28,19 @@ RUN --mount=type=cache,target=/root/.npm \
 # Build stage
 FROM base AS builder
 
-# Copy source code
+# Copy source code and configuration files
+COPY .eslintrc.js ./
+COPY .prettierrc ./
 COPY lib ./lib
 COPY services/order-service ./services/order-service
+
+# Generate Prisma client first (needed for TypeScript compilation)
+RUN cd lib && npx prisma generate
 
 # Build without cache mount to ensure proper file generation
 RUN cd lib && npm run build
 
 RUN cd services/order-service && npm run build
-
-# Generate Prisma client
-RUN cd lib && npx prisma generate
 
 # Integration stage (includes dev dependencies for testing)
 FROM base AS integration
@@ -65,7 +67,7 @@ cd /app/lib\n\
 npx prisma migrate deploy\n\
 echo "Starting application..."\n\
 cd /app/services/order-service\n\
-exec node dist/src/main.js' > /app/start.sh && chmod +x /app/start.sh
+exec node dist/main.js' > /app/start.sh && chmod +x /app/start.sh
 
 # Start the application
 CMD ["/app/start.sh"]

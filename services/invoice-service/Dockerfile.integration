@@ -65,7 +65,7 @@ cd /app/lib\n\
 npx prisma migrate deploy\n\
 echo "Starting application..."\n\
 cd /app/services/invoice-service\n\
-exec node dist/src/main.js' > /app/start.sh && chmod +x /app/start.sh
+exec node dist/main.js' > /app/start.sh && chmod +x /app/start.sh
 
 # Start the application
 CMD ["/app/start.sh"]

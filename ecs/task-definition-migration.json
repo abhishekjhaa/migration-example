@@ -1,0 +1,39 @@
+{
+  "family": "order-management-migration",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::ACCOUNT:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::ACCOUNT:role/ecsTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "migration",
+      "image": "ACCOUNT.dkr.ecr.REGION.amazonaws.com/order-service:latest",
+      "essential": true,
+      "command": [
+        "sh",
+        "-c",
+        "cd /app/lib && npx prisma migrate deploy"
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "/order-management/database/url"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/order-management-prod",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "migration"
+        }
+      }
+    }
+  ]
+}
+
+
+
+

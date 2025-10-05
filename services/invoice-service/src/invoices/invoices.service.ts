@@ -1,9 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import {
-  calculateTax,
-  calculateTotal,
-  generateInvoiceNumber,
-  handlePrismaError,
+    Cacheable,
+    CacheInvalidate,
+    calculateTax,
+    calculateTotal,
+    generateInvoiceNumber,
+    handlePrismaError,
 } from '@order-management/shared';
 import { OrderApiService } from '../external/order-api.service';
 import { InvoiceRepository } from './invoice.repository';
@@ -22,6 +24,7 @@ export class InvoicesService {
     private readonly orderApiService: OrderApiService,
   ) {}
 
+  @CacheInvalidate(['invoice:*', 'invoice-filters:*'])
   async createInvoice(createInvoiceData: CreateInvoiceData) {
     try {
       // Check if invoice already exists for this order
@@ -117,6 +120,7 @@ export class InvoicesService {
     }
   }
 
+  @Cacheable({ ttl: 300, keyPrefix: 'invoice' })
   async findById(id: string) {
     try {
       const invoice = await this.invoiceRepository.findById(id);
@@ -158,6 +162,7 @@ export class InvoicesService {
     }
   }
 
+  @Cacheable({ ttl: 180, keyPrefix: 'invoice-filters' })
   async findAll(filters?: {
     customerId?: string;
     status?: string;

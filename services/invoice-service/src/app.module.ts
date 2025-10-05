@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { PrismaModule } from '@order-management/shared';
+import { CacheModule, PrismaModule } from '@order-management/shared';
 import { HealthModule } from './health/health.module';
 import { InvoicesModule } from './invoices/invoices.module';
 
@@ -11,6 +11,7 @@ import { InvoicesModule } from './invoices/invoices.module';
       envFilePath: ['.env.local', '.env'],
     }),
     PrismaModule,
+    CacheModule,
     HealthModule,
     InvoicesModule,
   ],

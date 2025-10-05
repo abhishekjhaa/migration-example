@@ -1,12 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { handlePrismaError } from '@order-management/shared';
-import { OrderRepository } from './order.repository';
+import { Cacheable, CacheInvalidate, handlePrismaError } from '@order-management/shared';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { OrderRepository } from './order.repository';
 
 @Injectable()
 export class OrdersService {
   constructor(private readonly orderRepository: OrderRepository) {}
 
+  @CacheInvalidate(['order:*', 'customer-orders:*'])
   async create(createOrderDto: CreateOrderDto) {
     try {
       const order = await this.orderRepository.create(createOrderDto);
@@ -19,6 +20,7 @@ export class OrdersService {
     }
   }
 
+  @Cacheable({ ttl: 300, keyPrefix: 'order' })
   async findById(id: string) {
     try {
       const order = await this.orderRepository.findByIdWithDetails(id);

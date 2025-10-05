@@ -14,3 +14,10 @@ export * from './migration/migration.service';
 // Reconciliation utilities
 export * from './reconciliation/reconciliation.controller';
 export * from './reconciliation/reconciliation.service';
+
+// Cache utilities
+export * from './cache/cache-health.controller';
+export * from './cache/cache.decorator';
+export * from './cache/cache.interceptor';
+export * from './cache/cache.module';
+export * from './cache/cache.service';

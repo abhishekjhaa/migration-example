@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { handlePrismaError } from '@order-management/shared';
+import { Cacheable, CacheInvalidate, handlePrismaError } from '@order-management/shared';
 import { CustomerRepository } from './customer.repository';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 
@@ -7,6 +7,7 @@ import { CreateCustomerDto } from './dto/create-customer.dto';
 export class CustomersService {
   constructor(private readonly customerRepository: CustomerRepository) {}
 
+  @CacheInvalidate(['customer:*'])
   async create(createCustomerDto: CreateCustomerDto) {
     try {
       const customer = await this.customerRepository.create(createCustomerDto);
@@ -19,6 +20,7 @@ export class CustomersService {
     }
   }
 
+  @Cacheable({ ttl: 600, keyPrefix: 'customer' })
   async findById(id: string) {
     try {
       const customer = await this.customerRepository.findById(id);
@@ -48,6 +50,7 @@ export class CustomersService {
     }
   }
 
+  @Cacheable({ ttl: 300, keyPrefix: 'customer-orders' })
   async findCustomerOrders(customerId: string, isActive?: boolean): Promise<unknown[]> {
     try {
       // First verify customer exists

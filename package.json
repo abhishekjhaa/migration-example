@@ -1,0 +1,42 @@
+{
+  "name": "order-management-microservices",
+  "version": "1.0.0",
+  "description": "Modernized Order Management System with microservices architecture",
+  "scripts": {
+    "dev:order": "./scripts/dev-order-service.sh",
+    "dev:invoice": "./scripts/dev-invoice-service.sh",
+    "test:integration:order": "./scripts/run-order-service-integration-jest.sh",
+    "test:integration:invoice": "./scripts/run-invoice-service-integration-jest.sh",
+    "test:integration:full": "./scripts/run-full-integration-jest.sh",
+    "build:all": "npm run build:lib && npm run build:order && npm run build:invoice",
+    "build:lib": "cd lib && npm run build",
+    "build:order": "cd services/order-service && npm run build",
+    "build:invoice": "cd services/invoice-service && npm run build",
+    "format": "prettier --write \"**/*.{ts,js,json,md}\"",
+    "lint": "eslint \"**/*.ts\" --fix",
+    "lint:order": "cd services/order-service && npm run lint",
+    "lint:invoice": "cd services/invoice-service && npm run lint",
+    "format:order": "cd services/order-service && npm run format",
+    "format:invoice": "cd services/invoice-service && npm run format",
+    "docker:prod:up": "docker-compose -f docker-compose.prod.yml up -d",
+    "docker:prod:down": "docker-compose -f docker-compose.prod.yml down",
+    "docker:prod:logs": "docker-compose -f docker-compose.prod.yml logs -f",
+    "db:migrate": "cd lib && npx prisma migrate dev",
+    "db:migrate:prod": "cd lib && npx prisma migrate deploy",
+    "db:generate": "cd lib && npx prisma generate"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.2",
+    "eslint-plugin-prettier": "^5.5.4",
+    "prettier": "^3.6.2",
+    "typescript": "^5.0.0"
+  },
+  "workspaces": [
+    "lib",
+    "services/*"
+  ]
+}

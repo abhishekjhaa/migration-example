@@ -1,3 +1,17 @@
+Most of my time was spent on building the microservice functionality and architecting the migration strategy.
+
+For the microservices, my focus was on establishing clear domain boundaries and clean, consistent APIs. I introduced shared libraries, payload validation, and enforced the JSON:API response spec along with Swagger documentation. These design choices improve developer productivity and ensure consistency across teams as the system scales.
+
+I also added comprehensive integration tests to validate end-to-end behavior and catch regressions early. Since the business logic is relatively straightforward, unit tests were not necessary at this stage; however, as the system grows in complexity, we can layer them in for deeper coverage.
+
+On the migration front, my emphasis was on ensuring the ORM-based logic matches the original stored procedures, preserving business correctness while modernizing the stack. I’ve documented the detailed migration architecture and process in the Architecture.md file.
+
+For Docker builds, I ensured they are reproducible and platform-agnostic—the deploy-local command runs seamlessly (tested on macOS).
+
+I used AI coding agents to accelerate certain steps, such as generating CloudFormation templates and consolidating documentation, though I’ve marked the parts I couldn’t fully verify yet.
+
+Overall, this effort modernizes the system into a scalable, observable, and developer-friendly architecture, ready for CI/CD and trunk-based delivery.
+
 # Order Management System - Microservices Architecture
 
 A modernized Order Management System built with NestJS microservices, featuring PostgreSQL, Redis caching, and production-ready AWS ECS deployment.

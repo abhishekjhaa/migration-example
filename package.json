@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Modernized Order Management System with microservices architecture",
   "scripts": {
+    "deploy:local": "./scripts/deploy-local.sh",
     "dev:order": "./scripts/dev-order-service.sh",
     "dev:invoice": "./scripts/dev-invoice-service.sh",
     "test:integration:order": "./scripts/run-order-service-integration-jest.sh",
